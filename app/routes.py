@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, abort, make_response
 
 class Planet:
     def __init__(self, id, name, description, moons):
@@ -6,6 +6,17 @@ class Planet:
         self.name = name
         self.description = description
         self.moons = moons
+
+def validate_planet_id(planet_id):
+    ### to generalize for planets and moons, could input id# and list and then do for item in list, return item
+    try:
+        planet_id = int(planet_id)
+    except:
+        abort(make_response({"message": f"{planet_id} is not a valid type. Please use int."}, 400))
+    for planet in planets:
+        if planet.id == planet_id:
+            return planet
+    abort(make_response({"message": f"{planet_id} is not a valid planet. Please provide new ID."}, 404))
 
 planets = [
     Planet(1, "Mercury", "Smallest planet, closest to the sun", 0),
@@ -36,3 +47,19 @@ def handle_planets():
 
     return jsonify(planet_response)
 
+@planet_bp.route("/<planet_id>", methods=["GET"])
+
+def handle_single_planet(planet_id):
+    planet = validate_planet_id(planet_id)
+    return {
+            "id": planet.id,
+            "name": planet.name,
+            "description": planet.description,
+            "moons": planet.moons
+        }
+
+###As a client, I want to send a request...
+
+# 1. ...to get one existing `planet`, so that I can see the `id`, `name`, `description`, and other data of the `planet`.
+# 1. ... such that trying to get one non-existing `planet` responds with get a `404` response, so that I know the `planet` resource was not found.
+# 1. ... such that trying to get one `planet` with an invalid `planet_id` responds with get a `400` response, so that I know the `planet_id` was invalid.
