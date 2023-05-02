@@ -137,3 +137,22 @@ def delete_planet(planet_id):
     db.session.commit()
 
     return make_response(f"Planet #{planet_id} has been successfully deleted", 200)
+
+### creating new blueprint for moon model
+
+moon_bp = Blueprint("moons", __name__, url_prefix="/moons")
+
+@moon_bp.route("", methods=['POST'])
+
+def add_moon():
+    request_body = request.get_json()
+
+    new_moon = Moon(
+        name = request_body["name"],
+        radius = request_body["radius"]
+    )
+
+    db.session.add(new_moon)
+    db.session.commit()
+
+    return make_response(f"Moon {new_moon.name} successfully created!", 201)
