@@ -128,7 +128,7 @@ def update_planet(planet_id):
         "moons":planet.moons
         }, 200
 
-@planet_bp.route("/<planet_id>", method=["DELETE"])
+@planet_bp.route("/<planet_id>", methods=["DELETE"])
 
 def delete_planet(planet_id):
     planet = validate_planet_id(planet_id)
