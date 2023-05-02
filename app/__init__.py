@@ -23,7 +23,7 @@ def create_app(test_config=None):
 
     from app.models.planet import Planet
 
-
+    from app.models.moon import Moon
 
     return app
 
