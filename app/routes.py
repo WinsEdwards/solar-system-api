@@ -127,3 +127,13 @@ def update_planet(planet_id):
         "description": planet.description,
         "moons":planet.moons
         }, 200
+
+@planet_bp.route("/<planet_id>", method=["DELETE"])
+
+def delete_planet(planet_id):
+    planet = validate_planet_id(planet_id)
+
+    db.session.delete(planet)
+    db.session.commit()
+
+    return make_response(f"Planet #{planet_id} has been successfully deleted", 200)
