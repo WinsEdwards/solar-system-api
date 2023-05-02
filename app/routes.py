@@ -8,16 +8,19 @@ from app.models.planet import Planet
 #         self.description = description
 #         self.moons = moons
 
-# def validate_planet_id(planet_id):
-#     ### to generalize for planets and moons, could input id# and list and then do for item in list, return item
-#     try:
-#         planet_id = int(planet_id)
-#     except:
-#         abort(make_response({"message": f"{planet_id} is not a valid type. Please use int."}, 400))
-#     for planet in planets:
-#         if planet.id == planet_id:
-#             return planet
-#     abort(make_response({"message": f"{planet_id} is not a valid planet. Please provide new ID."}, 404))
+def validate_planet_id(planet_id):
+    ### to generalize for planets and moons, could input id# and list and then do for item in list, return item
+    try:
+        planet_id = int(planet_id)
+    except:
+        abort(make_response({"message": f"{planet_id} is not a valid type. Please use int."}, 400))
+    
+    planet = Planet.query.get(planet_id)
+
+    if not planet:
+        abort(make_response({"message": f"{planet_id} is not a valid planet. Please provide new ID."}, 404))
+    
+    return planet
 
 # planets = [
 #     Planet(1, "Mercury", "Smallest planet, closest to the sun", 0),
@@ -74,3 +77,53 @@ def add_planets():
     db.session.commit()
 
     return make_response(f"Planet {new_planet.name} successfully created!", 201)
+
+#define a route for getting all planets
+@planet_bp.route("", methods=["GET"])
+
+def read_all_planets():
+    planets_reponse = []
+    planets = Planet.query.all()
+
+    for planet in planets:
+        planets_reponse.append({
+            "id": planet.id,
+            "name": planet.name,
+            "description": planet.description,
+            "moons":planet.moons
+        })
+
+    return jsonify(planets_reponse)
+
+#define a route for getting all planets
+@planet_bp.route("/<planet_id>", methods=["GET"])
+
+def read_one_planet(planet_id):
+    planet = validate_planet_id(planet_id)
+
+    return {
+        "id": planet.id,
+        "name": planet.name,
+        "description": planet.description,
+        "moons":planet.moons
+        }, 200
+
+@planet_bp.route("/<planet_id>", methods=["PUT"])
+
+def update_planet(planet_id):
+    planet = validate_planet_id(planet_id)
+
+    request_body = request.get.json()
+
+    planet.name = request_body["name"]
+    planet.description = request_body["description"]
+    planet.moons = request_body["moons"]
+
+    db.session.commit()
+
+    return {
+        "id": planet.id,
+        "name": planet.name,
+        "description": planet.description,
+        "moons":planet.moons
+        }, 200
