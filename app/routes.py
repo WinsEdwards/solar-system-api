@@ -140,16 +140,20 @@ def delete_planet(planet_id):
 
 ### creating new blueprint for moon model
 
-moon_bp = Blueprint("moons", __name__, url_prefix="/moons")
+# moon_bp = Blueprint("moons", __name__, url_prefix="/moons")
 
-@moon_bp.route("", methods=['POST'])
+#  @moon_bp.route("", methods=['POST'])
+
+@planet_bp.route("/<planet_id>/moons", methods=["POST"])
+
 
 def add_moon():
     request_body = request.get_json()
 
     new_moon = Moon(
         name = request_body["name"],
-        radius = request_body["radius"]
+        radius = request_body["radius"],
+        planet = planet
     )
 
     db.session.add(new_moon)
