@@ -113,7 +113,7 @@ def read_one_planet(planet_id):
 def update_planet(planet_id):
     planet = validate_planet_id(planet_id)
 
-    request_body = request.get.json()
+    request_body = request.get_json()
 
     planet.name = request_body["name"]
     planet.description = request_body["description"]
