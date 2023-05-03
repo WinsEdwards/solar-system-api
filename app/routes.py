@@ -69,11 +69,23 @@ planet_bp = Blueprint("planets", __name__, url_prefix="/planets")
 def add_planets():
     request_body = request.get_json()
 
-    new_planet = Planet(
-        name = request_body["name"],
-        description = request_body["description"],
-        moons = request_body["moons"]
-    )
+    # determine request_body type, then proceed based on that
+
+    if type(request_body) == list:
+        
+        for i in request_body:
+            new_planet = Planet(
+            name = request_body["name"],
+            description = request_body["description"],
+            moons = request_body["moons"]
+            )
+
+    else:
+        new_planet = Planet(
+            name = request_body["name"],
+            description = request_body["description"],
+            moons = request_body["moons"]
+        )
 
     db.session.add(new_planet)
     db.session.commit()
