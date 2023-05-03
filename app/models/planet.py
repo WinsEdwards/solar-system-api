@@ -5,4 +5,4 @@ class Planet(db.Model):
     name = db.Column(db.String)
     description = db.Column(db.String)
     moons = db.Column(db.Integer)
-    moon_name = db.relationship("Moon", back_populates="planets")
+    # moon_name = db.relationship("Moon", back_populates="planets")
