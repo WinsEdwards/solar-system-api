@@ -69,16 +69,20 @@ planet_bp = Blueprint("planets", __name__, url_prefix="/planets")
 def add_planets():
     request_body = request.get_json()
 
+    print(request_body)
     # determine request_body type, then proceed based on that
+    planet_list = []
 
-    if type(request_body) == list:
+    if isinstance(request_body, list):
         
-        for i in request_body:
+        for single_planet in request_body:
             new_planet = Planet(
-            name = request_body["name"],
-            description = request_body["description"],
-            moons = request_body["moons"]
+            name = single_planet["name"],
+            description = single_planet["description"],
+            moons = single_planet["moons"]
             )
+
+            planet_list.append(new_planet)
 
     else:
         new_planet = Planet(
@@ -87,10 +91,12 @@ def add_planets():
             moons = request_body["moons"]
         )
 
-    db.session.add(new_planet)
+        planet_list.append(new_planet)
+    
+    db.session.add_all(planet_list)
     db.session.commit()
 
-    return make_response(f"Planet {new_planet.name} successfully created!", 201)
+    return f"Planet(s) successfully created!", 201
 
 #define a route for getting all planets
 @planet_bp.route("", methods=["GET"])
