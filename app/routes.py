@@ -76,11 +76,11 @@ def add_planets():
     if isinstance(request_body, list):
         
         for single_planet in request_body:
-            new_planet = planet.from_dict(single_planet)
+            new_planet = Planet.from_dict(single_planet)
             planet_list.append(new_planet)
 
     else:
-        new_planet = planet.from_dict(request_body)
+        new_planet = Planet.from_dict(request_body)
         planet_list.append(new_planet)
     
     db.session.add_all(planet_list)
