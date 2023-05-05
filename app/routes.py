@@ -10,19 +10,19 @@ from app.models.planet import Planet
 #         self.description = description
 #         self.moons = moons
 
-def validate_planet_id(planet_id):
+def validate_model(cls, model_id):
     ### to generalize for planets and moons, could input id# and list and then do for item in list, return item
     try:
-        planet_id = int(planet_id)
+        model_id = int(model_id)
     except:
-        abort(make_response({"message": f"{planet_id} is not a valid type. Please use int."}, 400))
+        abort(make_response({"message": f"{model_id} is not a valid type. Please use int."}, 400))
     
-    planet = Planet.query.get(planet_id)
+    model = cls.query.get(model_id)
 
-    if not planet:
-        abort(make_response({"message": f"{planet_id} is not a valid planet. Please provide new ID."}, 404))
+    if not model:
+        abort(make_response({"message": f"{cls.__name__} {model_id} does not exist. Please provide new ID."}, 404))
     
-    return planet
+    return model
 
 # planets = [
 #     Planet(1, "Mercury", "Smallest planet, closest to the sun", 0),
@@ -56,7 +56,7 @@ planet_bp = Blueprint("planets", __name__, url_prefix="/planets")
 # @planet_bp.route("/<planet_id>", methods=["GET"])
 
 # def handle_single_planet(planet_id):
-#     planet = validate_planet_id(planet_id)
+#     planet = validate_model(Planet, planet_id)
 #     return {
 #             "id": planet.id,
 #             "name": planet.name,
@@ -76,21 +76,11 @@ def add_planets():
     if isinstance(request_body, list):
         
         for single_planet in request_body:
-            new_planet = Planet(
-            name = single_planet["name"],
-            description = single_planet["description"],
-            moons = single_planet["moons"]
-            )
-
+            new_planet = planet.from_dict(single_planet)
             planet_list.append(new_planet)
 
     else:
-        new_planet = Planet(
-            name = request_body["name"],
-            description = request_body["description"],
-            moons = request_body["moons"]
-        )
-
+        new_planet = planet.from_dict(request_body)
         planet_list.append(new_planet)
     
     db.session.add_all(planet_list)
@@ -106,12 +96,7 @@ def read_all_planets():
     planets = Planet.query.all()
 
     for planet in planets:
-        planets_reponse.append({
-            "id": planet.id,
-            "name": planet.name,
-            "description": planet.description,
-            "moons":planet.moons
-        })
+        planets_reponse.append(planet.to_dict())
 
     return jsonify(planets_reponse)
 
@@ -119,19 +104,14 @@ def read_all_planets():
 @planet_bp.route("/<planet_id>", methods=["GET"])
 
 def read_one_planet(planet_id):
-    planet = validate_planet_id(planet_id)
+    planet = validate_model(Planet, planet_id)
 
-    return {
-        "id": planet.id,
-        "name": planet.name,
-        "description": planet.description,
-        "moons":planet.moons
-        }, 200
+    return planet.to_dict(), 200
 
 @planet_bp.route("/<planet_id>", methods=["PUT"])
 
 def update_planet(planet_id):
-    planet = validate_planet_id(planet_id)
+    planet = validate_model(Planet, planet_id)
 
     request_body = request.get_json()
 
@@ -141,17 +121,12 @@ def update_planet(planet_id):
 
     db.session.commit()
 
-    return {
-        "id": planet.id,
-        "name": planet.name,
-        "description": planet.description,
-        "moons":planet.moons
-        }, 200
+    return planet.to_dict(), 200
 
 @planet_bp.route("/<planet_id>", methods=["DELETE"])
 
 def delete_planet(planet_id):
-    planet = validate_planet_id(planet_id)
+    planet = validate_model(Planet, planet_id)
 
     db.session.delete(planet)
     db.session.commit()
@@ -169,7 +144,7 @@ def delete_planet(planet_id):
 
 # def add_moon(planet_id):
 #     request_body = request.get_json()
-#     planet = validate_planet_id(planet_id)
+#     planet = validate_model(Planet, planet_id)
 
 #     new_moon = Moon(
 #         name = request_body["name"],
