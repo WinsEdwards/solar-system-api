@@ -135,24 +135,21 @@ def delete_planet(planet_id):
 
 ### creating new blueprint for moon model
 
-# moon_bp = Blueprint("moons", __name__, url_prefix="/moons")
+moon_bp = Blueprint("moons", __name__, url_prefix="/moons")
 
-#  @moon_bp.route("", methods=['POST'])
+@moon_bp.route("/<planet_id>", methods=['POST'])
 
-# @planet_bp.route("/<planet_id>/moons", methods=["POST"])
+def add_moon(planet_id):
+    request_body = request.get_json()
+    planet = validate_model(Planet, planet_id)
 
+    new_moon = Moon(
+        name = request_body["name"],
+        radius = request_body["radius"],
+        planet = planet
+    )
 
-# def add_moon(planet_id):
-#     request_body = request.get_json()
-#     planet = validate_model(Planet, planet_id)
+    db.session.add(new_moon)
+    db.session.commit()
 
-#     new_moon = Moon(
-#         name = request_body["name"],
-#         radius = request_body["radius"],
-#         planet = planet
-#     )
-
-#     db.session.add(new_moon)
-#     db.session.commit()
-
-#     return make_response(f"Moon {new_moon.name} successfully created!", 201)
+    return make_response(f"Moon {new_moon.name} successfully created!", 201)
