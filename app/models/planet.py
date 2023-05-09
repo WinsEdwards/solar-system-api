@@ -4,8 +4,9 @@ class Planet(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String)
     description = db.Column(db.String)
+    moons = db.Column(db.Integer)
     moon_id = db.Column(db.Integer, db.ForeignKey('moon.id'))
-    moons = db.relationship("Moon", back_populates="planets")
+    moon = db.relationship("Moon", back_populates="planets")
 
 
     @classmethod
